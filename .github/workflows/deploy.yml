@@ -15,7 +15,6 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    # 【重点新增】：告诉 GitHub 所有的命令都在 vite-project 这个文件夹里执行
     defaults:
       run:
         working-directory: ./vite-project
@@ -28,12 +27,11 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "20"
-          cache: "npm"
-          # 【重点新增】：告诉 GitHub 去 vite-project 里面找缓存依赖
-          cache-dependency-path: ./vite-project/package-lock.json
+          # 【修改】：删除了之前的 cache 缓存配置，直接绕过找不到文件的报错
           
       - name: 📦 安装依赖
-        run: npm ci
+        # 【修改】：换成 npm install，它不强制要求提交 package-lock.json
+        run: npm install
         
       - name: 🔍 代码检查
         run: npm run lint --if-present
@@ -47,7 +45,6 @@ jobs:
       - name: 📤 上传构建产物
         uses: actions/upload-pages-artifact@v3
         with:
-          # 【重点修改】：告诉 GitHub 打包产物在这个路径下
           path: ./vite-project/dist
 
   deploy:
